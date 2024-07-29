@@ -37,7 +37,7 @@ parser.add_argument('--seed', type=int, default=123456, metavar='N',
                     help='random seed (default: 123456)')
 parser.add_argument('--batch_size', type=int, default=256, metavar='N',
                     help='batch size (default: 256)')
-parser.add_argument('--max_episode_steps', type=int, default=500, metavar='N',
+parser.add_argument('--max_episode_steps', type=int, default=100, metavar='N',
                     help='maximum number of steps (TTI) (default: 1000)')
 parser.add_argument('--max_episode', type=int, default=800, metavar='N',
                     help='maximum number of episodes (default: 1000)')
@@ -69,7 +69,8 @@ args = parser.parse_args()
 
 # Import se_max and H [TTI, BS, UE]
 
-H_file = h5py.File('./High_Mob_pre_process.hdf5','r')
+#H_file = h5py.File('./Low_Mob_pre_process.hdf5','r')
+H_file = h5py.File('../temp1/High_Mob_pre_process.hdf5','r')
 H_r = np.array(H_file.get('H_r'))
 H_i = np.array(H_file.get('H_i'))
 
@@ -96,6 +97,14 @@ epsilon = 10000
 
 # Agent
 agent = SAC(num_states, num_actions, max_actions, args)
+
+# load checkpoints
+
+tart_episode = 0
+ckpt_path = "checkpoints/sac_checkpoint_SMART_64_64_"
+start_episode = agent.load_checkpoint(ckpt_path)
+print(f"Resuming training from episode {start_episode}")
+    
 
 #Tensorboard
 writer = SummaryWriter('runs/{}_SAC_{}_{}_{}'.format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"), args.env_name,
@@ -235,14 +244,11 @@ for i_episode in range (args.max_episode):
         max_history_record = ue_ep_history
 
     if args.start_steps < total_numsteps and i_episode > 0 and i_episode % args.save_per_epochs == 0:
-        agent.save_checkpoint('SMART_64_64_high_mobile')
+        #agent.save_checkpoint('Low_Mob_pre_process')
+	agent.save_checkpoint('SMART_64_64_high_mobile')
 
-
-with h5py.File("./High_Mob_result.hdf5", "w") as data_file:
+with h5py.File("../temp1/High_Mob_result.hdf5", "w") as data_file:
     data_file.create_dataset("reward", data=reward_record)
     data_file.create_dataset("history", data=history_record)
     data_file.create_dataset("max_history", data=max_history_record)
 print('Training is finished\n')
-
-
-

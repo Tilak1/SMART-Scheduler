@@ -11,7 +11,7 @@ from mimo_sim_ul import *
 import h5py
 
 
-H_file  = h5py.File('./High_Mob_500_52_64_64.hdf5', 'r')
+H_file  = h5py.File('./ITU AI-ML Challenge Dataset/High_Mob_500_52_64_64.hdf5', 'r')
 
 
 H_r = H_file.get('H_r')[:,:,20,:]
@@ -50,7 +50,7 @@ for n_tti in range (0,500):
     normal_ur[n_tti] = np.sum(np.squeeze(se_max_ur[n_tti,:]))
 
 
-with h5py.File("./High_Mob_pre_process.hdf5", "w") as data_file:
+with h5py.File("./ITU AI-ML Challenge Dataset/High_Mob_pre_process.hdf5", "w") as data_file:
     data_file.create_dataset("se_max", data=se_max_ur)
     data_file.create_dataset("H_r", data=H_r)
     data_file.create_dataset("H_i", data=H_i)
